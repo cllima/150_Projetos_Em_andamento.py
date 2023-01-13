@@ -27,7 +27,7 @@ print('')
 idade=ano_atual-int(nasc) ## Tem que colocar int.
 
 if opção == 1:
-    print('Você nasceu em {}, e tem {} anos em {}.'.format(nasc, idade, ano_atual))
+    print('Você nasceu em {}, e tem {} anos em {} e do sexo MASCULINO!!'.format(nasc, idade, ano_atual))
 
     if idade == 18:
         print('Você tem que se alistar IMEDIATAMENTE!!!')

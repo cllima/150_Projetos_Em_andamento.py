@@ -7,8 +7,8 @@ from time import sleep
 
 nome = input('Qual o seu nome: ').strip().capitalize()
 
-print(f'\n{nome}. Vou escolher um exercício para você revisar.')
-input('Tecle \033[1:31m[ENTER]\033[m para que eu procure o exercício.')
+print(f'\n{nome}. Vou escolher um exercício para você REVISAR!!!')
+input('Tecle \033[1:31m[ENTER]\033[m para que eu procure o exercício:')
 while True:
 
     exercicio = randint(1, 50)
