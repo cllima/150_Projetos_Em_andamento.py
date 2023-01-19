@@ -13,14 +13,14 @@ while True:
     while tipo not in 'PI':
         tipo=str(input('PAR ou ÍMPAR [P/I]: ')).strip().upper()[0]
     print(f'Você jogou {jogador} e o computador {computador}. Total {total}', end=' => ')
-    if total % 2 == 0: #Se o tatal deu restou zero é igual a PAR.
+    if total % 2 == 0: #Se o total deu restou zero é igual a PAR.
         print('DEU PAR!!')
     else:
         print('DEU ÍMPAR!!')
     print('=' * 40)
 
     if tipo == 'P':
-        if total % 2 == 0: #Se o tatal deu restou zero é igual a PAR.
+        if total % 2 == 0: #Se o total deu restou zero é igual a PAR.
             print('PARABÉNS VOCÊ VENCEUUU!!!')
             vitoria+=1
         else:
@@ -28,7 +28,7 @@ while True:
             break
 
     elif tipo == 'I':
-        if total % 2 == 1: #Se o tatal deu restou 1 é igual a ÍMPAR.
+        if total % 2 == 1: #Se o total deu restou 1 é igual a ÍMPAR.
             print('PARABÉNS VOCÊ VENCEUUU!!!')
             vitoria+=1
         else:
