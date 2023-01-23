@@ -11,7 +11,7 @@ print(f'\n{nome}. Vou escolher um exercício para você REVISAR!!!')
 input('Tecle \033[1:31m[ENTER]\033[m para que eu procure o exercício:')
 while True:
 
-    exercicio = randint(1, 50)
+    exercicio = randint(1, 101)
 
     print('\n\33[1:35mEscolhendo...!!!\033[m', end='')
     for a in range(0,1):
