@@ -3,7 +3,7 @@
 #A) Os 5 primeiros colocados.
 #B) OS últimos 4 colocados da Tabela.
 #C) Uma lista com os Times em ordem alfabética.
-#D) Em que posição está o Time da Chapecoense.,
+#D) Em que posição está o Time da Fluminense.,
 # OBS.: Pegar a Tabela do Campeonato np Google.
 print('{:=^80}'.format(' Tabela do CAMPEONATO BRASILEIRO - 2022 '))
 print('=' * 80)
@@ -16,4 +16,4 @@ print(f'\nTabela de Classificação do Brasileirão::  \n{times}.')
 print(f'\nOs 5 primeiros colocados são:\n{times[:5]}')
 print(f'\nOs últimos 4 colocados da Tabela são:\n{times[-4:]}')
 print(f'\nLista com os Times em ordem alfabética:\n{sorted(times)}')
-print(f'O time do Botafogo está na {times.index("Fluminense")+1}ª posição.')
+print(f'O time do Fluminense está na {times.index("Fluminense")+1}ª posição.')
