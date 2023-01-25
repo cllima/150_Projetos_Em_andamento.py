@@ -8,10 +8,10 @@ print('-'*40)
 print('{:=^40}'.format(' Análise de dados em uma Tupla '))
 print('-'*40)
 # Colocando dentro de uma TUPLA
-num=(int(input('Digite um número: ')),
-        int(input('Digite outro número: ')),
-        int(input('Digite mais um número: ')),
-        int(input('Digite o último número: ')))
+
+## A variavel tem que ser antes do for, neste caso na mesma linha = List Comprehension
+num=tuple(int(input(f"Digite o {c}º número [1 a 10]: "))for c in range(1,5))
+
 print(f'\nForam digitado os valores {num}')
 print(f'O número 9 apareceu: {num.count(9)} vezes')
 if 3 in num:
@@ -19,11 +19,12 @@ if 3 in num:
 else:
     print('O valor 3 não foi digitado!!!')
 print(f'Os valores pares digitados são: ', end='')
+
 for n in num:
     if n % 2 == 0:
         print(n, end=' ')
 print('')
-print('{:=^40}'.format(' FIM DO PROGRAMA '))
+print('>>>>>>>>>> FIM DO PROGRAMA <<<<<<<<<<')
 
 
 
