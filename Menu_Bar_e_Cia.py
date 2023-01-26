@@ -38,7 +38,7 @@ while True:
     if count2 >= len(lista_preço):
         break
 print('-'*50)
-print(f"{'VALOR TOTAL:':.<40}R${total:>8.2f}")  # Está multiplicando somente o ultimo intens
+print(f"{'VALOR TOTAL:':.<40}R${total:>8.2f}")
 
 
 print(f'{"FIM DO PROGRAMA":^50}')
