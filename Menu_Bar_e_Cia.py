@@ -17,8 +17,7 @@ for c in range(quantidade_itens):
     quant = int(input(f'Ítens Consumido(s): '))
     print('=' * 50)
     lista_preço += (prato, preço)
-
-    total = preço * quant
+    total += (preço * quant) ### Não esquecer de colocar o += senão não soma todos os ìntens da lista
 
 # Contadores e Strings definidas
 count = 0
@@ -38,8 +37,9 @@ while True:
     count2 += 2
     if count2 >= len(lista_preço):
         break
-print(f"{'VALOR TOTAL:':.<40}R${total:>8.2f}")  ## Não está multiplicando
-
 print('-'*50)
+print(f"{'VALOR TOTAL:':.<40}R${total:>8.2f}")  # Está multiplicando somente o ultimo intens
+
+
 print(f'{"FIM DO PROGRAMA":^50}')
 print('='*50)

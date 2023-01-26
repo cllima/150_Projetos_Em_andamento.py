@@ -15,8 +15,10 @@ for posição in range(0, len(listagem)):
 		print(f'{listagem[posição]:.<35}', end='')
 	else:
 		print(f'R$ {listagem[posição]:>7.2f}')
-		soma += soma
-print(f"{'VALOR TOTAL':.<35}R${soma:>8.2f}")  ## Não está somando
+
+		soma += listagem[posição] ### Não esquecer de colocar o += senão não soma todos os ìntens da lista
+print('-'*45)
+print(f"{'VALOR TOTAL':.<35}R${soma:>8.2f}")
 
 print('='*45)
 print(f'{"FIM DO PROGRAMA":^40}')
