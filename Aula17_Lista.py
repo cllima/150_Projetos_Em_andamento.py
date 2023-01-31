@@ -13,9 +13,9 @@ if 'pizza' in lista_lanche:
 #valores=list(range(4,11))
 ####################################
 '''valores=[8,9,5,1,2,7,4]
-valores.sort() ## Coloca os valores de uma lista em ordem.
+valores.sort() ## Coloca os valores de uma lista em ordem crescente
 print(f'Valores em Ordem: {valores}')
-valores.sort(reverse=True) ## Coloca os valores de uma lista em ordem inversa.
+valores.sort(reverse=True) ## Coloca os valores de uma lista em ordem Decrescente.
 print(f'Valores em Ordem Inversa: {valores}')
 
 print(f'Tamanho da lista: {len(valores)} ítens')
@@ -33,7 +33,7 @@ num[2] = 7
 
 num.append(20) ## Adicionar valor ao final da lista.
 num.sort() ## Coloca a lista em ordem crescente
-#num.sort(reverse=True) ## Coloca a lista em ordem Inversa
+#num.sort(reverse=True) ## Coloca a lista em ordem Decrescente
 num.insert(3,15) ## Insere o valor 15 na posição 3 da lista.
 
 valor=int(input('Digite um número: '))
