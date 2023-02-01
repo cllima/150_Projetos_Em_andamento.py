@@ -27,7 +27,7 @@ for i, v in enumerate(num):  ### i==Indice, v==Valor
         impar.append(v)
 print('=' * 40)
 
-print(f'Forão digitados {len(num)} números, sendo {min(num)} o MENOR número'
+print(f'Foram digitados {len(num)} números, sendo {min(num)} o MENOR número'
       f'\ne o {max(num)} MAIOR número.')
 print(f'A Lista completa: {num}' 
     f'\nA lista com Valores PARES: {par}'
