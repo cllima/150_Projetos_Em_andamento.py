@@ -3,10 +3,10 @@ from tkinter import ttk ## Para chamar o ListBox Treeview
 import datetime as dt
 import sqlite3
 
-lista_codigo=[]
 # Criando janela de Apontamento:
-janela=Tk()
+root=Tk()
 
+## Aqui são criados as funções CRUD
 class Funcs(): ## Cria-se uma classe para cada função Back end
     def limpar_tela(self):
         self.codigo_entry.delete(0,END)
@@ -21,9 +21,9 @@ class Funcs(): ## Cria-se uma classe para cada função Back end
         self.producao_entry.delete(0,END)
     def conecta_db(self): #Criando Banco de dados
         self.conn = sqlite3.connect('apontamentos.bd')
-        self.cursor = self.conn.cursor(); print('Conectando ao Banco de dados')
+        self.cursor = self.conn.cursor(); print('Conectando ao Banco de dados!!!')
     def desconecta_db(self): #Sair do Banco de dados
-        self.conn.close(); print('Desconectando do Banco de dados')
+        self.conn.close(); print('Desconectando do Banco de dados...')
     def montaTabelas(self):
         self.conecta_db()
         ### Criando a Tabela do Banco de dados
@@ -32,18 +32,20 @@ class Funcs(): ## Cria-se uma classe para cada função Back end
                 cod INTEGER PRIMARY KEY,
                 operador INTERGER(10) NOT NULL,
                 nome CHAR (30) NOT NULL,
-                maquina CHAR(10),
-                op INTERGER(10),
-                descrição_op CHAR(30),
-                cod_ap INTERGER(10),
+                maquina CHAR(10) NOT NULL,
+                op INTERGER(10) NOT NULL,
+                descrição_op CHAR(30) NOT NULL,
+                cod_ap INTERGER(10) NOT NULL,
                 desp_acerto INTERGER(15),
                 desp_virando INTERGER(15),
                 producao INTERGER(15),
                 data_horario INTERGER(25)
             );
         """)
-        self.conn.commit(); print('Banco de dados criado com Sucessso')
+        self.conn.commit(); print('Banco de dados criado com Sucessso!!!')
         self.desconecta_db()
+
+    ## Foi criado a função Variaveis para evitar repetir código.
     def variaveis(self):
         self.codigo = self.codigo_entry.get()
         self.operador = self.operador_entry.get()
@@ -70,14 +72,14 @@ class Funcs(): ## Cria-se uma classe para cada função Back end
         self.select_lista() # Sempre que entrar novo apontamento a lista gera td novamente
         self.limpar_tela() # Limpar Tela
 
-    ### Criando a 3ª Tabela do Banco de dados
+    ### Criando a Tabela do Banco de dados
     ## ORDER BY operador ASC => Colocar em Ordem alfabetica
     def select_lista(self):
         self.listaApont.delete(*self.listaApont.get_children())
         self.conecta_db()
-                     #foi retirado a palavra cod,
-        lista = self.cursor.execute(""" SELECT operador, nome, maquina, op, descrição_op, cod_ap,
-         desp_acerto, desp_virando, producao FROM apontamentos ORDER BY operador DESC; """) ## ASC => Crescente
+                     #foi retirado a palavra cod, pois não esta atribuindo devido ao erro, arrumar depois
+        lista = self.cursor.execute(""" SELECT cod, operador, nome, maquina, op, descrição_op, cod_ap,
+         desp_acerto, desp_virando, producao FROM apontamentos ORDER BY cod DESC; """) ## ASC => Crescente
         for i in lista:
             self.listaApont.insert("", END, values=i)
         self.desconecta_db()
@@ -88,62 +90,75 @@ class Funcs(): ## Cria-se uma classe para cada função Back end
         self.listaApont.selection() # Seleciona a lista apontamento
 
         for n in self.listaApont.selection():
-            col1, col2, col3, col4, col5, col6, col7, col8, col9 = self.listaApont.item(n, 'values')
-            self.operador_entry.insert(END, col1)
-            self.nome_entry.insert(END, col2)
-            self.maquina_entry.insert(END, col3)
-            self.op_entry.insert(END, col4)
-            self.descrição_op_entry.insert(END, col5)
-            self.cod_ap_entry.insert(END, col6)
-            self.desp_acerto_entry.insert(END, col7)
-            self.desp_virando_entry.insert(END, col8)
-            self.producao_entry.insert(END, col9)
+            col1, col2, col3, col4, col5, col6, col7, col8, col9,col10 = self.listaApont.item(n, 'values')
+            self.codigo_entry.insert(END, col1)
+            self.operador_entry.insert(END, col2)
+            self.nome_entry.insert(END, col3)
+            self.maquina_entry.insert(END, col4)
+            self.op_entry.insert(END, col5)
+            self.descrição_op_entry.insert(END, col6)
+            self.cod_ap_entry.insert(END, col7)
+            self.desp_acerto_entry.insert(END, col8)
+            self.desp_virando_entry.insert(END, col9)
+            self.producao_entry.insert(END, col10)
 
     ## Função Deleta Apontamento
     def deleta_apontamento(self):
         self.variaveis() ## chama a função variaveis
         self.conecta_db()
-        self.cursor.execute(""" DELETE FROM apontamentos WHERE operador = ?""", (self.operador))
+        self.cursor.execute(""" DELETE FROM apontamentos WHERE cod = ?""", self.codigo)
         self.conn.commit()
         self.desconecta_db()
         self.limpar_tela()
         self.select_lista()
+    def alterar_apontamento(self):
+        self.variaveis()
+        self.conecta_db()
+        self.cursor.execute(""" UPDATE apontamentos SET operador = ?, nome = ?, maquina = ?, op = ?, descrição_op = ?, 
+        cod_ap = ?, desp_acerto = ?, desp_virando = ?, producao = ? WHERE cod = ? """,
+                            (self.operador, self.nome, self.maquina, self.op, self.descrição_op, self.cod_ap,
+                             self.desp_acerto, self.desp_virando, self.producao, self.codigo))
+        self.conn.commit()
+        self.desconecta_db()
+        self.select_lista()
+        self.limpar_tela()
 
 
 ## Função de Inicialização:
-### Sempre que criar um método, precisa char ele aqui self...
+### Sempre que criar um método, precisa chamar ele aqui self...
 class Apontamento(Funcs): ## Chama a classe Limpar função Front end
     def __init__(self):
-        self.janela = janela
+        self.root = root
         self.tela()
         self.frames_da_tela()
         self.widgets_janela1() ##Botões Janela1
         self.widgets_janela2() ## Janela2
         self.montaTabelas()
         self.select_lista()
+        self.Menus()
         #self.data_criacao = dt.datetime.now()
         #self.data_criacao = self.data_criacao.strftime('%d/%m/%Y %H:%M')
 
-        janela.mainloop()
+        root.mainloop()
 
 ## Criando função configuração tela Principal:
     def tela(self):
-        self.janela.title('SISTEMA DE APONTAMENTO DE PRODUÇÃO - MARGRAF')
-        self.janela.configure(background='#e2d9db')
-        self.janela.geometry("800x500")
-        self.janela.resizable(True,True) #Responsividade
-        self.janela.maxsize(width=1100,height=680) # Largura x Altura da Tela principal
-        self.janela.minsize(width=600, height=400)
+        self.root.title('SISTEMA DE APONTAMENTO DE PRODUÇÃO - MARGRAF')
+        self.root.configure(background='#e2d9db')
+        self.root.geometry("800x500")
+        self.root.resizable(True,True) #Responsividade
+        self.root.maxsize(width=1100,height=680) # Largura x Altura da Tela principal
+        self.root.minsize(width=600, height=400)
 
 ## Criando função frames => Janelas:
 ## Formas de trabalharmos com geometria e posicionamento => Pack;Grid;(Place) este é o melhor.
 ## Crindo Janela 1 e Janela 2
     def frames_da_tela(self):
-        self.janela_1 =Frame(self.janela,bd=4,bg='#EAE6E1',
+        self.janela_1 =Frame(self.root,bd=4,bg='#EAE6E1',
                             highlightbackground='#4A5957',highlightthickness=0.5) #highlightthickness = largura da borda
         self.janela_1.place(relx=0.02,rely=0.03,relwidth=0.96,relheight=0.55) #1=direito, 0=esquerdo => dimensões da janela1.
 
-        self.janela_2= Frame(self.janela, bd=4, bg='#EAE6E1',
+        self.janela_2= Frame(self.root, bd=4, bg='#EAE6E1',
                              highlightbackground='#4A5957',highlightthickness=0.5)  # highlightthickness = largura da borda
         self.janela_2.place(relx=0.02, rely=0.62, relwidth=0.96,relheight=0.34)  # 1=direito, 0=esquerdo => dimensões da janela1.
     def widgets_janela1(self):
@@ -164,7 +179,7 @@ class Apontamento(Funcs): ## Chama a classe Limpar função Front end
 
         ## Criando botão Alterar
         self.bt_alterar = Button(self.janela_1, text='Alterar',bd=4,bg='#D9D6D2',fg='#4543BA'
-                              ,font=('verdana', 8,'bold')) # bd=Borda, bg=cor de fundo, fg=cor de texto)
+                              ,font=('verdana', 8,'bold'), command=self.alterar_apontamento) # bd=Borda, bg=cor de fundo, fg=cor de texto)
         self.bt_alterar.place(relx=0.73, rely=0.05, relwidth=0.1, relheight=0.15)  # place=lugar do botão
 
         ## Criando botão Excluir
@@ -172,6 +187,7 @@ class Apontamento(Funcs): ## Chama a classe Limpar função Front end
                               ,font=('verdana', 8,'bold'), command=self.deleta_apontamento)
         self.bt_excluir.place(relx=0.84, rely=0.05, relwidth=0.1, relheight=0.15)  # place=lugar do botão
 
+        ###########################################################
         ## Criação da Label e Código
         self.lb_codigo = Label(self.janela_1, text='Código', fg='#4543BA', font=('verdana', 8, 'bold'))
         self.lb_codigo.place(relx=0.05, rely=0.22)
@@ -236,7 +252,7 @@ class Apontamento(Funcs): ## Chama a classe Limpar função Front end
     def widgets_janela2(self):
         self.listaApont=ttk.Treeview(self.janela_2,height=3,columns=("col1","col2","col3","col4","col5","col6",
                                                                      "col7","col8","col9"))
-        #self.listaApont.heading("#0", text="Cod.")
+        self.listaApont.heading("#0", text="Cod.")
         self.listaApont.heading("#1", text="Operador")
         self.listaApont.heading("#2", text="Nome")
         self.listaApont.heading("#3", text="Máquina")
@@ -247,7 +263,7 @@ class Apontamento(Funcs): ## Chama a classe Limpar função Front end
         self.listaApont.heading("#8", text="Desp_virando")
         self.listaApont.heading("#9", text="Produção")
 
-        #self.listaApont.heading("#6", text="Horas")
+        #self.listaApont.heading("#10", text="Horas")
 
 
 # Criando o Tamanho das colunas
@@ -271,8 +287,24 @@ class Apontamento(Funcs): ## Chama a classe Limpar função Front end
         self.listaApont.configure(yscroll=self.scroolista.set)
         self.scroolista.place(relx=0.96, rely=0.1,relwidth=0.04,relheight=0.85)
 
-        ## função duplo click ( event)
+## função duplo click ( event)
         self.listaApont.bind("<Double-1>", self.OnDoubleClick)
+
+    # Criando Menu superior
+    def Menus(self):
+        menubar = Menu(self.root)
+        self.root.config(menu=menubar)
+        filemenu = Menu(menubar)
+        filemenu2 = Menu(menubar)
+
+        def Quit(): self.root.destroy()
+
+        #Cria-se os menus e as variáveis e os nomes dos menus
+        menubar.add_cascade(label= "Opções", menu= filemenu)
+        menubar.add_cascade(label= "Sobre", menu= filemenu2)
+        # Cria-se os comandos
+        filemenu.add_command(label= "Sair", command= Quit)
+        filemenu2.add_command(label= "Limpa Tela", command=self.limpar_tela)
 
 
 Apontamento()
