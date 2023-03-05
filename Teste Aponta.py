@@ -203,6 +203,20 @@ class Funcs(): ## Cria-se uma classe para cada função Back end
         self.select_lista()
         self.limpar_tela()
 
+## Faz uma busca pelo nome do operador
+    def busca_Apontamento(self):
+        self.conecta_bd()
+        self.listaApont.delete(*self.listaApont.get_children())
+
+        self.nome_entry.insert(END, '%') ## Colocando % na frente do nome
+        nome = self.nome_entry.get()
+        self.cursor.execute(""" SELECT cod, operador, nome, maquina, op, descrição_op, cod_ap,
+         desp_acerto, desp_virando, producao FROM apontamentos WHERE nome LIKE '%s' ORDER BY nome ASC""" % nome)
+        buscanomeApont = self.cursor.fetchall()
+        for i in buscanomeApont:
+            self.listaApont.insert("", END, values=i)
+        self.limpar_tela()
+        self.desconecta_bd()
 
 ## Função de Inicialização:
 ### Sempre que criar um método, precisa chamar ele aqui self...
@@ -254,7 +268,7 @@ class Apontamento(Funcs, Relatorios): ## Chama a classe Limpar função Front en
 
         ## Criando botão Buscar
         self.bt_buscar = Button(self.janela_1, text='Buscar',bd=4,bg='#D9D6D2',fg='#4543BA'
-                              ,font=('verdana', 8,'bold')) # bd=Borda, bg=cor de fundo, fg=cor de texto)
+                              ,font=('verdana', 8,'bold'), command=self.busca_Apontamento) # bd=Borda, bg=cor de fundo, fg=cor de texto)
         self.bt_buscar.place(relx=0.16, rely=0.05, relwidth=0.1, relheight=0.15)  # place=lugar do botão
 
         ## Criando botão Alterar
