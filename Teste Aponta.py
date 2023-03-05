@@ -1,4 +1,4 @@
-from tkinter import*
+from tkinter import *
 from tkinter import ttk ## Para chamar o ListBox Treeview
 import datetime as dt
 import sqlite3
@@ -19,13 +19,13 @@ class Funcs(): ## Cria-se uma classe para cada função Back end
         self.desp_acerto_entry.delete(0,END)
         self.desp_virando_entry.delete(0,END)
         self.producao_entry.delete(0,END)
-    def conecta_db(self): #Criando Banco de dados
-        self.conn = sqlite3.connect('apontamentos.bd')
+    def conecta_bd(self): #Criando Banco de dados
+        self.conn = sqlite3.connect('apontamentos.db')
         self.cursor = self.conn.cursor(); print('Conectando ao Banco de dados!!!')
-    def desconecta_db(self): #Sair do Banco de dados
+    def desconecta_bd(self): #Sair do Banco de dados
         self.conn.close(); print('Desconectando do Banco de dados...')
     def montaTabelas(self):
-        self.conecta_db()
+        self.conecta_bd()
         ### Criando a Tabela do Banco de dados
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS apontamentos(
@@ -39,11 +39,11 @@ class Funcs(): ## Cria-se uma classe para cada função Back end
                 desp_acerto INTERGER(15),
                 desp_virando INTERGER(15),
                 producao INTERGER(15),
-                data_horario INTERGER(25)
+                data_horario VARCHAR(25)
             );
         """)
         self.conn.commit(); print('Banco de dados criado com Sucessso!!!')
-        self.desconecta_db()
+        self.desconecta_bd()
 
     ## Foi criado a função Variaveis para evitar repetir código.
     def variaveis(self):
@@ -59,7 +59,7 @@ class Funcs(): ## Cria-se uma classe para cada função Back end
         self.producao = self.producao_entry.get()
     def add_apontamento(self):
         self.variaveis()
-        self.conecta_db()
+        self.conecta_bd()
 
         ### Criando a 2ª Tabela do Banco de dados
         # (?) para cada coluna a ser alimentada
@@ -68,7 +68,7 @@ class Funcs(): ## Cria-se uma classe para cada função Back end
                             (self.operador, self.nome, self.maquina, self.op, self.descrição_op, self.cod_ap,
                              self.desp_acerto, self.desp_virando, self.producao))
         self.conn.commit()
-        self.desconecta_db()
+        self.desconecta_bd()
         self.select_lista() # Sempre que entrar novo apontamento a lista gera td novamente
         self.limpar_tela() # Limpar Tela
 
@@ -76,13 +76,13 @@ class Funcs(): ## Cria-se uma classe para cada função Back end
     ## ORDER BY operador ASC => Colocar em Ordem alfabetica
     def select_lista(self):
         self.listaApont.delete(*self.listaApont.get_children())
-        self.conecta_db()
-                     #foi retirado a palavra cod, pois não esta atribuindo devido ao erro, arrumar depois
+        self.conecta_bd()
+
         lista = self.cursor.execute(""" SELECT cod, operador, nome, maquina, op, descrição_op, cod_ap,
-         desp_acerto, desp_virando, producao FROM apontamentos ORDER BY cod DESC; """) ## ASC => Crescente
+         desp_acerto, desp_virando, producao FROM apontamentos ORDER BY operador ASC; """) ## ASC => Crescente
         for i in lista:
             self.listaApont.insert("", END, values=i)
-        self.desconecta_db()
+        self.desconecta_bd()
 
     ## Função seleciona linha com duplo click e pucha os dados para memória
     def OnDoubleClick(self, event):  ## Tradução => Ao clicar duas vezes
@@ -105,21 +105,21 @@ class Funcs(): ## Cria-se uma classe para cada função Back end
     ## Função Deleta Apontamento
     def deleta_apontamento(self):
         self.variaveis() ## chama a função variaveis
-        self.conecta_db()
-        self.cursor.execute(""" DELETE FROM apontamentos WHERE cod = ?""", self.codigo)
+        self.conecta_bd()
+        self.cursor.execute(""" DELETE FROM apontamentos WHERE cod = ?""", (self.codigo,)) ## <- precisa colocar uma vírgula, pois se trata de uma tupla
         self.conn.commit()
-        self.desconecta_db()
+        self.desconecta_bd()
         self.limpar_tela()
         self.select_lista()
     def alterar_apontamento(self):
         self.variaveis()
-        self.conecta_db()
+        self.conecta_bd()
         self.cursor.execute(""" UPDATE apontamentos SET operador = ?, nome = ?, maquina = ?, op = ?, descrição_op = ?, 
         cod_ap = ?, desp_acerto = ?, desp_virando = ?, producao = ? WHERE cod = ? """,
                             (self.operador, self.nome, self.maquina, self.op, self.descrição_op, self.cod_ap,
                              self.desp_acerto, self.desp_virando, self.producao, self.codigo))
         self.conn.commit()
-        self.desconecta_db()
+        self.desconecta_bd()
         self.select_lista()
         self.limpar_tela()
 
@@ -251,41 +251,43 @@ class Apontamento(Funcs): ## Chama a classe Limpar função Front end
 # Criando a Janela 2
     def widgets_janela2(self):
         self.listaApont=ttk.Treeview(self.janela_2,height=3,columns=("col1","col2","col3","col4","col5","col6",
-                                                                     "col7","col8","col9"))
-        self.listaApont.heading("#0", text="Cod.")
-        self.listaApont.heading("#1", text="Operador")
-        self.listaApont.heading("#2", text="Nome")
-        self.listaApont.heading("#3", text="Máquina")
-        self.listaApont.heading("#4", text="OP")
-        self.listaApont.heading("#5", text="Descrição_OP")
-        self.listaApont.heading("#6", text="Código")
-        self.listaApont.heading("#7", text="Desp_acerto")
-        self.listaApont.heading("#8", text="Desp_virando")
-        self.listaApont.heading("#9", text="Produção")
-
-        #self.listaApont.heading("#10", text="Horas")
+                                                                     "col7","col8","col9","col10","col11"))
+        self.listaApont.heading("#0", text="")
+        self.listaApont.heading("#1", text="Cod.")
+        self.listaApont.heading("#2", text="Operador")
+        self.listaApont.heading("#3", text="Nome")
+        self.listaApont.heading("#4", text="Máquina")
+        self.listaApont.heading("#5", text="OP")
+        self.listaApont.heading("#6", text="Descrição OP")
+        self.listaApont.heading("#7", text="Código")
+        self.listaApont.heading("#8", text="Desp. Acerto")
+        self.listaApont.heading("#9", text="Desp. Virando")
+        self.listaApont.heading("#10", text="Produção")
+        self.listaApont.heading("#11", text="Horário")
 
 
 # Criando o Tamanho das colunas
         self.listaApont.column("#0",width=1)
-        self.listaApont.column("#1", width=30)
-        self.listaApont.column("#2", width=180)
-        self.listaApont.column("#3", width=40)
-        self.listaApont.column("#4", width=50)
-        self.listaApont.column("#5", width=180)
-        self.listaApont.column("#6", width=20)
-        self.listaApont.column("#7", width=50)
+        self.listaApont.column("#1", width=2)
+        self.listaApont.column("#2", width=28)
+        self.listaApont.column("#3", width=150)
+        self.listaApont.column("#4", width=25)
+        self.listaApont.column("#5", width=20)
+        self.listaApont.column("#6", width=180)
+        self.listaApont.column("#7", width=20)
         self.listaApont.column("#8", width=50)
-        self.listaApont.column("#9", width=80)
+        self.listaApont.column("#9", width=50)
+        self.listaApont.column("#10", width=40)
+        self.listaApont.column("#11", width=35)
 
 
 # Criando Posição das colunas
         self.listaApont.place(relx=0.01,rely=0.1,relwidth=0.95,relheight=0.85)
 
 # Criando Barra de rolagem
-        self.scroolista=Scrollbar(self.janela_2,orient='vertical')
-        self.listaApont.configure(yscroll=self.scroolista.set)
-        self.scroolista.place(relx=0.96, rely=0.1,relwidth=0.04,relheight=0.85)
+        self.scroolLista=Scrollbar(self.janela_2,orient='vertical',command=self.listaApont.yview)
+        self.listaApont.configure(yscroll=self.scroolLista.set)
+        self.scroolLista.place(relx=0.96, rely=0.1,relwidth=0.04,relheight=0.85)
 
 ## função duplo click ( event)
         self.listaApont.bind("<Double-1>", self.OnDoubleClick)
@@ -294,8 +296,8 @@ class Apontamento(Funcs): ## Chama a classe Limpar função Front end
     def Menus(self):
         menubar = Menu(self.root)
         self.root.config(menu=menubar)
-        filemenu = Menu(menubar)
-        filemenu2 = Menu(menubar)
+        filemenu = Menu(menubar,tearoff= 0) ## tearoff= 0 => Elimina os tracejados
+        filemenu2 = Menu(menubar,tearoff= 0)
 
         def Quit(): self.root.destroy()
 
