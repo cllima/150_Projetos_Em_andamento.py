@@ -2,9 +2,81 @@ from tkinter import *
 from tkinter import ttk ## Para chamar o ListBox Treeview
 import datetime as dt
 import sqlite3
+## Gerando Relatório PDF Baixar na página > https://www.reportlab.com/software/opensource/rl-toolkit/download/
+# Assistir vídeo # https://www.youtube.com/watch?v=DjxDm1MUbe0
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.platypus import SimpleDocTemplate, Image
+import webbrowser
+from PIL import ImageTk, Image
+import base64
+
 
 # Criando janela de Apontamento:
 root=Tk()
+
+## Gerando Relatório PDF
+##("apontamento.pdf") ## Aqui pode colocar a caminho da pasta conforme abaixo
+#E:\Python\pythonProject\ReratApontPDF\Apontamento.pdf
+
+class Relatorios():
+    def printApont(self):
+        webbrowser.open("E:\Python\pythonProject\ReratApontPDF\Apontamento.pdf")
+    def geraRelatApont(self):
+        self.apont = canvas.Canvas("E:\Python\pythonProject\ReratApontPDF\Apontamento.pdf")
+
+        self.codigoRel = self.codigo_entry.get()
+        self.operadorRel = self.operador_entry.get()
+        self.nomeRel = self.nome_entry.get()
+        self.maquiaRel = self.maquina_entry.get()
+        self.opRel = self.op_entry.get()
+        self.descrição_opRel = self.descrição_op_entry.get()
+        self.cod_apRel = self.cod_ap_entry.get()
+        self.desp_acertoRel = self.desp_acerto_entry.get()
+        self.desp_virandoRel = self.desp_virando_entry.get()
+        self.producaoRel = self.producao_entry.get()
+        #self.horarioRel = self.horario_entry.get()
+
+        self.apont.setFont("Helvetica-Bold", 14)
+    ## drawString => desenha na tela
+        self.apont.drawString(150, 750, 'Ficha de Apontamento - Produção Individual')
+    ## Criar corpo do PDF => as descrições
+        self.apont.setFont("Helvetica-Bold", 8)
+        self.apont.drawString(50, 700, 'Código: ')
+        self.apont.drawString(50, 680, 'Operador: ')
+        self.apont.drawString(50, 660, 'Nome: ')
+        self.apont.drawString(50, 640, 'Máquina: ')
+        self.apont.drawString(50, 620, 'OP: ')
+        self.apont.drawString(50, 600, 'Descrição da OP: ')
+        self.apont.drawString(50, 580, 'Cod. Apontamento: ')
+        self.apont.drawString(50, 560, 'Cod. Acerto: ')
+        self.apont.drawString(50, 540, 'Cod. Virando: ')
+        self.apont.drawString(50, 520, 'Produção: ')
+        #self.apont.drawString(50, 500, 'Horário: ')
+
+    ## Criar corpo do PDF a direita => Informações
+        self.apont.setFont("Helvetica-Bold", 7)
+        self.apont.drawString(150, 700, self.codigoRel)
+        self.apont.drawString(150, 680, self.operadorRel)
+        self.apont.drawString(150, 660, self.nomeRel)
+        self.apont.drawString(150, 640, self.maquiaRel)
+        self.apont.drawString(150, 620, self.opRel)
+        self.apont.drawString(150, 600, self.descrição_opRel)
+        self.apont.drawString(150, 580, self.cod_apRel)
+        self.apont.drawString(150, 560, self.desp_acertoRel)
+        self.apont.drawString(150, 540, self.desp_virandoRel)
+        self.apont.drawString(150, 520, self.producaoRel)
+        # self.apont.drawString(150, 500, self.horarioRel)
+
+    ## Chamar o PDF
+        self.apont.showPage()
+        ## Salvar o PDF
+        self.apont.save()
+        self.printApont()
+
+
 
 ## Aqui são criados as funções CRUD
 class Funcs(): ## Cria-se uma classe para cada função Back end
@@ -19,6 +91,7 @@ class Funcs(): ## Cria-se uma classe para cada função Back end
         self.desp_acerto_entry.delete(0,END)
         self.desp_virando_entry.delete(0,END)
         self.producao_entry.delete(0,END)
+        #self.horario_entry.delete(0,END)
     def conecta_bd(self): #Criando Banco de dados
         self.conn = sqlite3.connect('apontamentos.db')
         self.cursor = self.conn.cursor(); print('Conectando ao Banco de dados!!!')
@@ -126,7 +199,7 @@ class Funcs(): ## Cria-se uma classe para cada função Back end
 
 ## Função de Inicialização:
 ### Sempre que criar um método, precisa chamar ele aqui self...
-class Apontamento(Funcs): ## Chama a classe Limpar função Front end
+class Apontamento(Funcs, Relatorios): ## Chama a classe Limpar função Front end
     def __init__(self):
         self.root = root
         self.tela()
@@ -303,10 +376,12 @@ class Apontamento(Funcs): ## Chama a classe Limpar função Front end
 
         #Cria-se os menus e as variáveis e os nomes dos menus
         menubar.add_cascade(label= "Opções", menu= filemenu)
-        menubar.add_cascade(label= "Sobre", menu= filemenu2)
+        menubar.add_cascade(label= "Relatórios", menu= filemenu2)
         # Cria-se os comandos
         filemenu.add_command(label= "Sair", command= Quit)
-        filemenu2.add_command(label= "Limpa Tela", command=self.limpar_tela)
+        filemenu.add_command(label= "Limpa Tela", command=self.limpar_tela)
+
+        filemenu2.add_command(label="Ficha de Apontamento", command=self.geraRelatApont)
 
 
 Apontamento()
