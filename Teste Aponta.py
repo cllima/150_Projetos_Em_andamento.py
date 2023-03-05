@@ -10,6 +10,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import SimpleDocTemplate, Image
 import webbrowser
+from tkinter import messagebox
 from PIL import ImageTk, Image
 import base64
 
@@ -25,58 +26,64 @@ class Relatorios():
     def printApont(self):
         webbrowser.open("E:\Python\pythonProject\ReratApontPDF\Apontamento.pdf")
     def geraRelatApont(self):
-        self.apont = canvas.Canvas("E:\Python\pythonProject\ReratApontPDF\Apontamento.pdf")
+# try e except => serve para informar erro
+        try:
+            self.apont = canvas.Canvas("E:\Python\pythonProject\ReratApontPDF\Apontamento.pdf")
 
-        self.codigoRel = self.codigo_entry.get()
-        self.operadorRel = self.operador_entry.get()
-        self.nomeRel = self.nome_entry.get()
-        self.maquiaRel = self.maquina_entry.get()
-        self.opRel = self.op_entry.get()
-        self.descrição_opRel = self.descrição_op_entry.get()
-        self.cod_apRel = self.cod_ap_entry.get()
-        self.desp_acertoRel = self.desp_acerto_entry.get()
-        self.desp_virandoRel = self.desp_virando_entry.get()
-        self.producaoRel = self.producao_entry.get()
-        #self.horarioRel = self.horario_entry.get()
+            self.codigoRel = self.codigo_entry.get()
+            self.operadorRel = self.operador_entry.get()
+            self.nomeRel = self.nome_entry.get()
+            self.maquiaRel = self.maquina_entry.get()
+            self.opRel = self.op_entry.get()
+            self.descrição_opRel = self.descrição_op_entry.get()
+            self.cod_apRel = self.cod_ap_entry.get()
+            self.desp_acertoRel = self.desp_acerto_entry.get()
+            self.desp_virandoRel = self.desp_virando_entry.get()
+            self.producaoRel = self.producao_entry.get()
+            #self.horarioRel = self.horario_entry.get()
 
-        self.apont.setFont("Helvetica-Bold", 14)
-    ## drawString => desenha na tela
-        self.apont.drawString(150, 750, 'Ficha de Apontamento - Produção Individual')
-    ## Criar corpo do PDF => as descrições
-        self.apont.setFont("Helvetica-Bold", 8)
-        self.apont.drawString(50, 700, 'Código: ')
-        self.apont.drawString(50, 680, 'Operador: ')
-        self.apont.drawString(50, 660, 'Nome: ')
-        self.apont.drawString(50, 640, 'Máquina: ')
-        self.apont.drawString(50, 620, 'OP: ')
-        self.apont.drawString(50, 600, 'Descrição da OP: ')
-        self.apont.drawString(50, 580, 'Cod. Apontamento: ')
-        self.apont.drawString(50, 560, 'Cod. Acerto: ')
-        self.apont.drawString(50, 540, 'Cod. Virando: ')
-        self.apont.drawString(50, 520, 'Produção: ')
-        #self.apont.drawString(50, 500, 'Horário: ')
+            self.apont.setFont("Helvetica-Bold", 14)
+        ## drawString => desenha na tela
+            self.apont.drawString(150, 775, 'Ficha de Apontamento - Produção Individual')
+        ## Criar corpo do PDF => as descrições
+            self.apont.setFont("Helvetica-Bold", 8)
+            self.apont.drawString(50, 700, 'Código: ')
+            self.apont.drawString(50, 680, 'Operador: ')
+            self.apont.drawString(50, 660, 'Nome: ')
+            self.apont.drawString(50, 640, 'Máquina: ')
+            self.apont.drawString(50, 620, 'OP: ')
+            self.apont.drawString(50, 600, 'Descrição da OP: ')
+            self.apont.drawString(50, 580, 'Cod. Apontamento: ')
+            self.apont.drawString(50, 560, 'Cod. Acerto: ')
+            self.apont.drawString(50, 540, 'Cod. Virando: ')
+            self.apont.drawString(50, 520, 'Produção: ')
+            #self.apont.drawString(50, 500, 'Horário: ')
 
-    ## Criar corpo do PDF a direita => Informações
-        self.apont.setFont("Helvetica-Bold", 7)
-        self.apont.drawString(150, 700, self.codigoRel)
-        self.apont.drawString(150, 680, self.operadorRel)
-        self.apont.drawString(150, 660, self.nomeRel)
-        self.apont.drawString(150, 640, self.maquiaRel)
-        self.apont.drawString(150, 620, self.opRel)
-        self.apont.drawString(150, 600, self.descrição_opRel)
-        self.apont.drawString(150, 580, self.cod_apRel)
-        self.apont.drawString(150, 560, self.desp_acertoRel)
-        self.apont.drawString(150, 540, self.desp_virandoRel)
-        self.apont.drawString(150, 520, self.producaoRel)
-        # self.apont.drawString(150, 500, self.horarioRel)
+        ## Criar corpo do PDF a direita => Informações
+            self.apont.setFont("Helvetica-Bold", 7)
+            self.apont.drawString(150, 700, self.codigoRel)
+            self.apont.drawString(150, 680, self.operadorRel)
+            self.apont.drawString(150, 660, self.nomeRel)
+            self.apont.drawString(150, 640, self.maquiaRel)
+            self.apont.drawString(150, 620, self.opRel)
+            self.apont.drawString(150, 600, self.descrição_opRel)
+            self.apont.drawString(150, 580, self.cod_apRel)
+            self.apont.drawString(150, 560, self.desp_acertoRel)
+            self.apont.drawString(150, 540, self.desp_virandoRel)
+            self.apont.drawString(150, 520, self.producaoRel)
+            # self.apont.drawString(150, 500, self.horarioRel)
+## Criando Moldura na folha
+            self.apont.rect(20,500,550,1,fill=True, stroke=False)
 
-    ## Chamar o PDF
-        self.apont.showPage()
-        ## Salvar o PDF
-        self.apont.save()
-        self.printApont()
-
-
+        ## Chamar o PDF
+            self.apont.showPage()
+            ## Salvar o PDF
+            self.apont.save()
+            self.printApont()
+        except:
+            messagebox.showinfo(title="ERRO",message="Erro ao criar arquivo PDF!!!")
+            return
+        messagebox.showinfo(title="APONTAMENTO-MARGRAF",message="PDF-Criado com Sucesso!!")
 
 ## Aqui são criados as funções CRUD
 class Funcs(): ## Cria-se uma classe para cada função Back end
