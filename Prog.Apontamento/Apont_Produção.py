@@ -11,8 +11,8 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import SimpleDocTemplate, Image
 import webbrowser
 from tkinter import messagebox
-from PIL import ImageTk, Image
-import base64
+from PIL import ImageTk, Image  # imagem de botões
+
 
 
 # Criando janela de Apontamento:
@@ -218,6 +218,7 @@ class Funcs(): ## Cria-se uma classe para cada função Back end
         self.limpar_tela()
         self.desconecta_bd()
 
+
 ## Função de Inicialização:
 ### Sempre que criar um método, precisa chamar ele aqui self...
 class Apontamento(Funcs, Relatorios): ## Chama a classe Limpar função Front end
@@ -242,7 +243,7 @@ class Apontamento(Funcs, Relatorios): ## Chama a classe Limpar função Front en
         self.root.geometry("800x500")
         self.root.resizable(True,True) #Responsividade
         self.root.maxsize(width=1100,height=680) # Largura x Altura da Tela principal
-        self.root.minsize(width=600, height=400)
+        self.root.minsize(width=900, height=500)
 
 ## Criando função frames => Janelas:
 ## Formas de trabalharmos com geometria e posicionamento => Pack;Grid;(Place) este é o melhor.
@@ -254,30 +255,30 @@ class Apontamento(Funcs, Relatorios): ## Chama a classe Limpar função Front en
 
         self.janela_2= Frame(self.root, bd=4, bg='#EAE6E1',
                              highlightbackground='#4A5957',highlightthickness=0.5)  # highlightthickness = largura da borda
-        self.janela_2.place(relx=0.02, rely=0.62, relwidth=0.96,relheight=0.34)  # 1=direito, 0=esquerdo => dimensões da janela1.
+        self.janela_2.place(relx=0.02, rely=0.60, relwidth=0.96,relheight=0.38)  # 1=direito, 0=esquerdo => dimensões da janela1.
     def widgets_janela1(self):
         ## Criando botão Novo
-        self.bt_novo = Button(self.janela_1, text='Novo', bd=4, bg='#D9D6D2', fg='#4543BA'
+        self.bt_novo = Button(self.janela_1, text='Novo', bd=4, bg='#D9D6D2', fg='#4543BA', activebackground='#008000', activeforeground='white'
                               , font=('verdana', 8, 'bold'), command=self.add_apontamento)  # bd=Borda, bg=cor de fundo, fg=cor de texto)
         self.bt_novo.place(relx=0.05, rely=0.05, relwidth=0.1, relheight=0.15)  # place=lugar do botão
 
         ## Criando botão Limpar
-        self.bt_limpar=Button(self.janela_1, text='Limpar',bd=4,bg='#D9D6D2',fg='#4543BA'
+        self.bt_limpar=Button(self.janela_1, text='Limpar',bd=4,bg='#D9D6D2',fg='#4543BA',activebackground='#A9A9A9', activeforeground='white'
                               ,font=('verdana', 8,'bold'), command=self.limpar_tela) # bd=Borda, bg=cor de fundo, fg=cor de texto
         self.bt_limpar.place(relx=0.62,rely=0.05,relwidth=0.1, relheight=0.15) # place=lugar do botão
 
         ## Criando botão Buscar
-        self.bt_buscar = Button(self.janela_1, text='Buscar',bd=4,bg='#D9D6D2',fg='#4543BA'
+        self.bt_buscar = Button(self.janela_1, text='Buscar',bd=4,bg='#D9D6D2',fg='#4543BA',activebackground='#A9A9A9', activeforeground='white'
                               ,font=('verdana', 8,'bold'), command=self.busca_Apontamento) # bd=Borda, bg=cor de fundo, fg=cor de texto)
         self.bt_buscar.place(relx=0.16, rely=0.05, relwidth=0.1, relheight=0.15)  # place=lugar do botão
 
         ## Criando botão Alterar
-        self.bt_alterar = Button(self.janela_1, text='Alterar',bd=4,bg='#D9D6D2',fg='#4543BA'
+        self.bt_alterar = Button(self.janela_1, text='Alterar',bd=4,bg='#D9D6D2',fg='#4543BA',activebackground='#A9A9A9', activeforeground='white'
                               ,font=('verdana', 8,'bold'), command=self.alterar_apontamento) # bd=Borda, bg=cor de fundo, fg=cor de texto)
         self.bt_alterar.place(relx=0.73, rely=0.05, relwidth=0.1, relheight=0.15)  # place=lugar do botão
 
         ## Criando botão Excluir
-        self.bt_excluir = Button(self.janela_1, text='Excluir',bd=4,bg='#D9D6D2',fg='#4543BA'
+        self.bt_excluir = Button(self.janela_1, text='Excluir',bd=4,bg='#D9D6D2',fg='#4543BA',activebackground='#EC2300', activeforeground='white'
                               ,font=('verdana', 8,'bold'), command=self.deleta_apontamento)
         self.bt_excluir.place(relx=0.84, rely=0.05, relwidth=0.1, relheight=0.15)  # place=lugar do botão
 
@@ -361,7 +362,7 @@ class Apontamento(Funcs, Relatorios): ## Chama a classe Limpar função Front en
 
 
 # Criando o Tamanho das colunas
-        self.listaApont.column("#0",width=1)
+        self.listaApont.column("#0",width=0)
         self.listaApont.column("#1", width=2)
         self.listaApont.column("#2", width=28)
         self.listaApont.column("#3", width=150)
@@ -376,12 +377,12 @@ class Apontamento(Funcs, Relatorios): ## Chama a classe Limpar função Front en
 
 
 # Criando Posição das colunas
-        self.listaApont.place(relx=0.01,rely=0.1,relwidth=0.95,relheight=0.85)
+        self.listaApont.place(relx=0.01,rely=0.02,relwidth=0.956,relheight=0.98)
 
 # Criando Barra de rolagem
         self.scroolLista=Scrollbar(self.janela_2,orient='vertical',command=self.listaApont.yview)
         self.listaApont.configure(yscroll=self.scroolLista.set)
-        self.scroolLista.place(relx=0.96, rely=0.1,relwidth=0.04,relheight=0.85)
+        self.scroolLista.place(relx=0.97, rely=0.02,relwidth=0.025,relheight=0.97)
 
 ## função duplo click ( event)
         self.listaApont.bind("<Double-1>", self.OnDoubleClick)
