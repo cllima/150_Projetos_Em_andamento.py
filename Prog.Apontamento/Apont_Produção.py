@@ -1,5 +1,7 @@
 from tkinter import *
 from tkinter import ttk ## Para chamar o ListBox Treeview
+from tkinter import tix # Balão de mensagem
+from tkinter import messagebox # Caixa de mensagem
 import datetime as dt
 import sqlite3
 ## Gerando Relatório PDF Baixar na página > https://www.reportlab.com/software/opensource/rl-toolkit/download/
@@ -12,15 +14,41 @@ from reportlab.platypus import SimpleDocTemplate, Image
 import webbrowser
 from tkinter import messagebox
 from PIL import ImageTk, Image  # imagem de botões
-
+import base64
 
 
 # Criando janela de Apontamento:
-root=Tk()
+root=tix.Tk()
 
-## Gerando Relatório PDF
-##("apontamento.pdf") ## Aqui pode colocar a caminho da pasta conforme abaixo
-#E:\Python\pythonProject\ReratApontPDF\Apontamento.pdf
+#Curso Tkinter - Aula 24 - Efeito gradiente no frame
+class GradientFrame(Canvas):
+    def __init__(self, parent, color1='', color2='', **kwargs):
+        Canvas.__init__(self, parent, **kwargs)
+        self._color1 = color1
+        self._color2 = color2
+        self.bind('<Configure>', self._draw_gradient)
+    def _draw_gradient(self, event=None):
+        self.delete('gradient')
+        width = self.winfo_width()
+        height = self.winfo_height()
+        limit = width
+        (r1, g1, b1) = self.winfo_rgb(self._color1)
+        (r2, g2, b2) = self.winfo_rgb(self._color2)
+        r_ratio = float(r2-r1) / limit
+        g_ratio = float(g2-g1) / limit
+        b_ratio = float(b2-b1) / limit
+
+        for i in range(limit):
+            nr = int(r1 + (r_ratio * i))
+            ng = int(g1 + (g_ratio * i))
+            nb = int(b1 + (b_ratio * i))
+            color = "#%4.4x%4.4x%4.4x" % (nr, ng, nb)
+            self.create_line(i,0,i, height, tags=('gradient',), fill=color)
+        self.lower('gradient')
+
+    ## Gerando Relatório PDF
+    ##("apontamento.pdf") ## Aqui pode colocar a caminho da pasta conforme abaixo
+    #E:\Python\pythonProject\ReratApontPDF\Apontamento.pdf
 
 class Relatorios():
     def printApont(self):
@@ -139,18 +167,23 @@ class Funcs(): ## Cria-se uma classe para cada função Back end
         self.producao = self.producao_entry.get()
     def add_apontamento(self):
         self.variaveis()
-        self.conecta_bd()
-
-        ### Criando a 2ª Tabela do Banco de dados
-        # (?) para cada coluna a ser alimentada
-        self.cursor.execute(""" INSERT INTO apontamentos (operador, nome, maquina, op, descrição_op, cod_ap,
-         desp_acerto, desp_virando, producao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                            (self.operador, self.nome, self.maquina, self.op, self.descrição_op, self.cod_ap,
-                             self.desp_acerto, self.desp_virando, self.producao))
-        self.conn.commit()
-        self.desconecta_bd()
-        self.select_lista() # Sempre que entrar novo apontamento a lista gera td novamente
-        self.limpar_tela() # Limpar Tela
+        ## Caixa de Mensagem - estando fazia a caixa operador aparece a mensagem.
+        if self.operador_entry.get() == "":
+            msg = "Para iniciar um novo Apontamento é necessário \n"
+            msg += "que seja digitado o Operador"
+            messagebox.showinfo("Cadastro de Apontamento - Aviso!!!", msg)
+        else:
+            self.conecta_bd()
+            ### Criando a 2ª Tabela do Banco de dados
+            # (?) para cada coluna a ser alimentada
+            self.cursor.execute(""" INSERT INTO apontamentos (operador, nome, maquina, op, descrição_op, cod_ap,
+             desp_acerto, desp_virando, producao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                                (self.operador, self.nome, self.maquina, self.op, self.descrição_op, self.cod_ap,
+                                 self.desp_acerto, self.desp_virando, self.producao))
+            self.conn.commit()
+            self.desconecta_bd()
+            self.select_lista() # Sempre que entrar novo apontamento a lista gera td novamente
+            self.limpar_tela() # Limpar Tela
 
     ### Criando a Tabela do Banco de dados
     ## ORDER BY operador ASC => Colocar em Ordem alfabetica
@@ -219,8 +252,8 @@ class Funcs(): ## Cria-se uma classe para cada função Back end
         self.desconecta_bd()
 
 
-## Função de Inicialização:
-### Sempre que criar um método, precisa chamar ele aqui self...
+    ## Função de Inicialização:
+    ### Sempre que criar um método, precisa chamar ele aqui self...
 class Apontamento(Funcs, Relatorios): ## Chama a classe Limpar função Front end
     def __init__(self):
         self.root = root
@@ -236,7 +269,7 @@ class Apontamento(Funcs, Relatorios): ## Chama a classe Limpar função Front en
 
         root.mainloop()
 
-## Criando função configuração tela Principal:
+    ## Criando função configuração tela Principal:
     def tela(self):
         self.root.title('SISTEMA DE APONTAMENTO DE PRODUÇÃO - MARGRAF')
         self.root.configure(background='#e2d9db')
@@ -245,9 +278,9 @@ class Apontamento(Funcs, Relatorios): ## Chama a classe Limpar função Front en
         self.root.maxsize(width=1100,height=680) # Largura x Altura da Tela principal
         self.root.minsize(width=900, height=500)
 
-## Criando função frames => Janelas:
-## Formas de trabalharmos com geometria e posicionamento => Pack;Grid;(Place) este é o melhor.
-## Crindo Janela 1 e Janela 2
+    ## Criando função frames => Janelas:
+    ## Formas de trabalharmos com geometria e posicionamento => Pack;Grid;(Place) este é o melhor.
+    ## Crindo Janela 1 e Janela 2
     def frames_da_tela(self):
         self.janela_1 =Frame(self.root,bd=4,bg='#EAE6E1',
                             highlightbackground='#4A5957',highlightthickness=0.5) #highlightthickness = largura da borda
@@ -257,93 +290,145 @@ class Apontamento(Funcs, Relatorios): ## Chama a classe Limpar função Front en
                              highlightbackground='#4A5957',highlightthickness=0.5)  # highlightthickness = largura da borda
         self.janela_2.place(relx=0.02, rely=0.60, relwidth=0.96,relheight=0.38)  # 1=direito, 0=esquerdo => dimensões da janela1.
     def widgets_janela1(self):
+        # Criando Abas
+        self.abas = ttk.Notebook(self.janela_1)
+        self.aba1 = GradientFrame(self.abas, "#DCDCDC", "#A9A9A9")
+        self.aba2 = GradientFrame(self.abas, "#808080", "#DCDCDC")
+        self.aba3 = GradientFrame(self.abas, "#FFF0F5", "#F0FFFF")
+        self.aba4 = Frame(self.abas)
+        #Cores das Abas
+        self.aba1.configure(background='#EAE6E1')
+        self.aba2.configure(background='#DCDCDC')
+        self.aba3.configure(background='#DCDCDC')
+        self.aba4.configure(background='#DCDCDC')
+        # Nome para cada Aba
+        self.abas.add(self.aba1, text='Aba 1')
+        self.abas.add(self.aba2, text='Aba 2')
+        self.abas.add(self.aba3, text='Aba 3')
+        self.abas.add(self.aba4, text='Aba 4')
+        # Posicionar na Tela
+        self.abas.place(relx=0.01, rely=0.0, relwidth=0.98, relheight=0.98)
+
+        ## Caixa de texto Aba2
+        self.lb_texto = Label(self.aba2, text='Caixa de Texto:', fg='#4543BA', font=('verdana', 7, 'bold'))
+        self.lb_texto.place(relx=0.02, rely=0.10)
+        self.texto_entry = Entry(self.aba2)
+        self.texto_entry.place(relx=0.02, rely=0.17, height=180, width=500)
+
         ## Criando botão Novo
-        self.bt_novo = Button(self.janela_1, text='Novo', bd=4, bg='#D9D6D2', fg='#4543BA', activebackground='#008000', activeforeground='white'
+        self.bt_novo = Button(self.aba1, text='Novo', bd=4, bg='#D9D6D2', fg='#4543BA', activebackground='#008000', activeforeground='white'
                               , font=('verdana', 8, 'bold'), command=self.add_apontamento)  # bd=Borda, bg=cor de fundo, fg=cor de texto)
         self.bt_novo.place(relx=0.05, rely=0.05, relwidth=0.1, relheight=0.15)  # place=lugar do botão
 
         ## Criando botão Limpar
-        self.bt_limpar=Button(self.janela_1, text='Limpar',bd=4,bg='#D9D6D2',fg='#4543BA',activebackground='#A9A9A9', activeforeground='white'
+        self.bt_limpar=Button(self.aba1, text='Limpar',bd=4,bg='#D9D6D2',fg='#4543BA',activebackground='#A9A9A9', activeforeground='white'
                               ,font=('verdana', 8,'bold'), command=self.limpar_tela) # bd=Borda, bg=cor de fundo, fg=cor de texto
         self.bt_limpar.place(relx=0.62,rely=0.05,relwidth=0.1, relheight=0.15) # place=lugar do botão
 
         ## Criando botão Buscar
-        self.bt_buscar = Button(self.janela_1, text='Buscar',bd=4,bg='#D9D6D2',fg='#4543BA',activebackground='#A9A9A9', activeforeground='white'
+        self.bt_buscar = Button(self.aba1, text='Buscar',bd=4,bg='#D9D6D2',fg='#4543BA',activebackground='#A9A9A9', activeforeground='white'
                               ,font=('verdana', 8,'bold'), command=self.busca_Apontamento) # bd=Borda, bg=cor de fundo, fg=cor de texto)
         self.bt_buscar.place(relx=0.16, rely=0.05, relwidth=0.1, relheight=0.15)  # place=lugar do botão
 
+        # Variável balão de mensagem = Buscar
+        texto_balao_buscar = "Informe o nome que deseja pesquisar"
+        self.balao_buscar = tix.Balloon(self.aba1)
+        self.balao_buscar.subwidget('label')['image'] = BitmapImage()  # tira a seta do balão
+        self.balao_buscar.bind_widget(self.bt_buscar, balloonmsg=texto_balao_buscar)
+
         ## Criando botão Alterar
-        self.bt_alterar = Button(self.janela_1, text='Alterar',bd=4,bg='#D9D6D2',fg='#4543BA',activebackground='#A9A9A9', activeforeground='white'
+        self.bt_alterar = Button(self.aba1, text='Alterar',bd=4,bg='#D9D6D2',fg='#4543BA',activebackground='#A9A9A9', activeforeground='white'
                               ,font=('verdana', 8,'bold'), command=self.alterar_apontamento) # bd=Borda, bg=cor de fundo, fg=cor de texto)
         self.bt_alterar.place(relx=0.73, rely=0.05, relwidth=0.1, relheight=0.15)  # place=lugar do botão
 
         ## Criando botão Excluir
-        self.bt_excluir = Button(self.janela_1, text='Excluir',bd=4,bg='#D9D6D2',fg='#4543BA',activebackground='#EC2300', activeforeground='white'
+        self.bt_excluir = Button(self.aba1, text='Excluir',bd=4,bg='#D9D6D2',fg='#4543BA',activebackground='#EC2300', activeforeground='white'
                               ,font=('verdana', 8,'bold'), command=self.deleta_apontamento)
         self.bt_excluir.place(relx=0.84, rely=0.05, relwidth=0.1, relheight=0.15)  # place=lugar do botão
 
+        # Variável balão de mensagem = Excluir
+        texto_balao_excluir = "Deseja realmente Excluir!!"
+        self.balao_excluir = tix.Balloon(self.aba1)
+        self.balao_excluir.subwidget('label')['image'] = BitmapImage()  # tira a seta do balão
+        self.balao_excluir.bind_widget(self.bt_excluir, balloonmsg=texto_balao_excluir)
+
+        ### Criando Botão para a bucar a Segunda Janela, neste caso deixei na opções
+       # self.bt_buscarj = Button(self.aba1, text='2ª Janela', bd=4, bg='#D9D6D2', fg='#4543BA', activebackground='#A9A9A9',
+                              #  activeforeground='white', font=('verdana', 8, 'bold'),command=self.segunda_janela)
+      # self.bt_buscarj.place(relx=0.40, rely=0.05, relwidth=0.1, relheight=0.15)
+
+
         ###########################################################
         ## Criação da Label e Código
-        self.lb_codigo = Label(self.janela_1, text='Código', fg='#4543BA', font=('verdana', 8, 'bold'))
+        self.lb_codigo = Label(self.aba1, text='Código', fg='#4543BA', font=('verdana', 8, 'bold'))
         self.lb_codigo.place(relx=0.05, rely=0.22)
-        self.codigo_entry = Entry(self.janela_1)
+        self.codigo_entry = Entry(self.aba1)
         self.codigo_entry.place(relx=0.15, rely=0.22, relwidth=0.02)
 
         ## Criação da Label e Entrada do Operador
-        self.lb_operador=Label(self.janela_1, text='Operador',fg='#4543BA',font=('verdana', 8,'bold'))
+        self.lb_operador=Label(self.aba1, text='Operador',fg='#4543BA',font=('verdana', 8,'bold'))
         self.lb_operador.place(relx=0.05, rely=0.32)
-        self.operador_entry=Entry(self.janela_1)
+        self.operador_entry=Entry(self.aba1)
         self.operador_entry.place(relx=0.15, rely=0.32,relwidth=0.08)
 
         ## Criação da Label e Entrada do Nome
-        self.lb_nome = Label(self.janela_1, text='Nome') ## Nome
+        self.lb_nome = Label(self.aba1, text='Nome') ## Nome
         self.lb_nome.place(relx=0.24, rely=0.32)
-        self.nome_entry = Entry(self.janela_1)
+        self.nome_entry = Entry(self.aba1)
         self.nome_entry.place(relx=0.24, rely=0.32, relwidth=0.40)
 
         ## Criação da Label e Entrada Equipamento
-        self.lb_maquina = Label(self.janela_1, text='Máquina', fg='#4543BA', font=('verdana', 8, 'bold'))
+        self.lb_maquina = Label(self.aba1, text='Máquina', fg='#4543BA', font=('verdana', 8, 'bold'))
         self.lb_maquina.place(relx=0.71, rely=0.32)
-        self.maquina_entry = Entry(self.janela_1)
+        self.maquina_entry = Entry(self.aba1)
         self.maquina_entry.place(relx=0.80, rely=0.32, relwidth=0.08)
 
         ## Criação da Label e Entrada OP
-        self.lb_op = Label(self.janela_1, text='Nº OP', fg='#4543BA', font=('verdana', 8, 'bold'))
+        self.lb_op = Label(self.aba1, text='Nº OP', fg='#4543BA', font=('verdana', 8, 'bold'))
         self.lb_op.place(relx=0.05, rely=0.5)
-        self.op_entry = Entry(self.janela_1)
+        self.op_entry = Entry(self.aba1)
         self.op_entry.place(relx=0.05, rely=0.6, relwidth=0.08)
 
         ## Criação da Label e Entrada Descrição OP
-        self.lb_descrição_op = Label(self.janela_1, text='Descrição da OP', fg='#4543BA', font=('verdana', 8, 'bold'))
+        self.lb_descrição_op = Label(self.aba1, text='Descrição da OP', fg='#4543BA', font=('verdana', 8, 'bold'))
         self.lb_descrição_op.place(relx=0.15, rely=0.5)
-        self.descrição_op_entry = Entry(self.janela_1)
+        self.descrição_op_entry = Entry(self.aba1)
         self.descrição_op_entry.place(relx=0.15, rely=0.6, relwidth=0.25)
 
         ## Criação da Label e Entrada Código Desp. de Acerto
-        self.lb_cod_ap = Label(self.janela_1, text='Cod. Apont', fg='#4543BA', font=('verdana', 8, 'bold'))
+        self.lb_cod_ap = Label(self.aba1, text='Cod. Apont', fg='#4543BA', font=('verdana', 8, 'bold'))
         self.lb_cod_ap.place(relx=0.05, rely=0.80)
-        self.cod_ap_entry = Entry(self.janela_1)
+        self.cod_ap_entry = Entry(self.aba1)
         self.cod_ap_entry.place(relx=0.05, rely=0.90, relwidth=0.07)
 
         ## Criação da Label e Entrada Desp. de Acerto
-        self.lb_desp_acerto = Label(self.janela_1, text='Desp. de Acerto', fg='#4543BA', font=('verdana', 8, 'bold'))
+        self.lb_desp_acerto = Label(self.aba1, text='Desp. de Acerto', fg='#4543BA', font=('verdana', 8, 'bold'))
         self.lb_desp_acerto.place(relx=0.20, rely=0.80)
-        self.desp_acerto_entry = Entry(self.janela_1)
+        self.desp_acerto_entry = Entry(self.aba1)
         self.desp_acerto_entry.place(relx=0.20, rely=0.90, relwidth=0.15)
 
         ## Criação da Label e Entrada Desp. Virando
-        self.lb_desp_virando = Label(self.janela_1, text='Desp. Virando', fg='#4543BA', font=('verdana', 8, 'bold'))
+        self.lb_desp_virando = Label(self.aba1, text='Desp. Virando', fg='#4543BA', font=('verdana', 8, 'bold'))
         self.lb_desp_virando.place(relx=0.48, rely=0.80)
-        self.desp_virando_entry = Entry(self.janela_1)
+        self.desp_virando_entry = Entry(self.aba1)
         self.desp_virando_entry.place(relx=0.48, rely=0.90, relwidth=0.15)
 
         ## Criação da Label e Entrada Produção
-        self.lb_producao = Label(self.janela_1, text='Qtd. Produzida',fg='#4543BA',font=('verdana', 8,'bold'))
+        self.lb_producao = Label(self.aba1, text='Qtd. Produzida',fg='#4543BA',font=('verdana', 8,'bold'))
         self.lb_producao.place(relx=0.78, rely=0.80)
-        self.producao_entry = Entry(self.janela_1)
+        self.producao_entry = Entry(self.aba1)
         self.producao_entry.place(relx=0.78, rely=0.90, relwidth=0.15)
 
-# Criando a Janela 2
+        #### dropdown button - Criando menu suspenso
+        self.Tipvar = StringVar()
+        self.TipV = ('Goss', 'M600','Off-Set','Kolbus')
+        self.Tipvar.set('Goss')
+        self.popupMenu = OptionMenu(self.aba3, self.Tipvar, *self.TipV)
+        self.popupMenu.place(relx=0.01, rely=0.02, relwidth=0.1, relheight=0.1)
+        self.maquinas = self.Tipvar.get()
+        print(self.maquinas)
+
+    # Criando a Janela 2
     def widgets_janela2(self):
         self.listaApont=ttk.Treeview(self.janela_2,height=3,columns=("col1","col2","col3","col4","col5","col6",
                                                                      "col7","col8","col9","col10","col11"))
@@ -399,11 +484,31 @@ class Apontamento(Funcs, Relatorios): ## Chama a classe Limpar função Front en
         #Cria-se os menus e as variáveis e os nomes dos menus
         menubar.add_cascade(label= "Opções", menu= filemenu)
         menubar.add_cascade(label= "Relatórios", menu= filemenu2)
+
         # Cria-se os comandos
         filemenu.add_command(label= "Sair", command= Quit)
         filemenu.add_command(label= "Limpa Tela", command=self.limpar_tela)
+        ## Buscando a 2ª Janela
+        filemenu.add_command(label= "Ir para nova janela", command=self.segunda_janela) ## comando abrir_janela2
 
         filemenu2.add_command(label="Ficha de Apontamento", command=self.geraRelatApont)
+
+    ## Trabalhando com múltiplas janelas - Toplevel
+    def segunda_janela(self):
+        self.root2 = Toplevel()
+        self.root2.title('2ª Janela')
+        self.root2.configure(background='#DCDCDC')
+        self.root2.geometry('450x200')
+        self.root2.resizable(False, False)
+        self.root2.transient(self.root)
+        self.root2.focus_force()  ## Deixa uma janela na frente da outra
+        self.root2.grab_set()  ## Impede que seja apertado algum widget na 1ª janela
+        ## Botão fechar
+        self.botao_voltar = Button(self.root2,text='Fechar Janela', bd=4, bg='#D9D6D2', fg='#4543BA',
+                                 activebackground='#c3d2d6', activeforeground='black'
+                                 ,font=('verdana', 7, 'bold'), command=self.root2.destroy) ## .destroy = esse botão é responsável por fechar a janela.
+        self.botao_voltar.grid()
+        self.botao_voltar.place(relx=0.02, rely=0.05, relwidth=0.20, relheight=0.15) # place=lugar do botão
 
 
 Apontamento()
